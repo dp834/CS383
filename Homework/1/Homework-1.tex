@@ -1,0 +1,141 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfig}
+
+\author{Damien Prieur}
+\title{Assignment 1 \\ CS 383}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Theory}
+\begin{enumerate}
+\item Consider the following supervised dataset:\\
+\begin{center}
+$X=
+ \begin{bmatrix}
+    -2\\
+    -5\\
+    -3\\
+    0\\
+    -8\\
+    -2\\
+    1\\
+    5\\
+    -1\\
+    6\\
+\end{bmatrix},
+Y=
+ \begin{bmatrix}
+    1\\
+    -4\\
+    1\\
+    3\\
+    11\\
+    5\\
+    0\\
+    -1\\
+    -3\\
+    1\\
+\end{bmatrix}
+$
+\end{center}
+    \begin{enumerate}
+    \item Compute the coefficients for the linear regression using least squares estimate (LSE).  Show your work and remember to add a bias feature.  You can use numpy.linalg.inv to compute the inverse.  Compute this model using \textbf{all} of the data (don't worry about separating into training and testing sets).\\
+    \begin {center}
+    $X=\begin{bmatrix}
+    1&  -2\\
+    1& -5\\
+    1&  -3\\
+    1&  0\\
+    1&  -8\\
+    1&  -2\\
+    1&  1\\
+    1&  5\\
+    1&  -1\\
+    1&  6\\
+    \end{bmatrix},
+    X^T = \begin{bmatrix}
+         1&  1&  1&  1&  1&  1&  1&  1&  1&  1\\
+        -2& -5& -3&  0& -8& -2&  1&  5& -1&  6\\
+        \end{bmatrix}
+    $
+    $$X^TX = \begin{bmatrix}
+        10& -9\\
+        -9& 169\\
+    \end{bmatrix},
+    (X^TX)^{-1} = \begin{bmatrix}
+        0.10503418& 0.00559354\\
+        0.00559354& 0.00621504\\
+    \end{bmatrix},
+    X^TY = \begin{bmatrix}
+        14\\
+        -79\\
+    \end{bmatrix}
+    $$
+    $$\Theta = (X^TX)^{-1}X^TY = \begin{bmatrix}
+        1.0285892\\
+        -0.412679\\
+    \end{bmatrix}
+    $$
+    \end{center}
+    Intercept: 1.0285891858297078 \\
+    Slope: -0.41267868241143574
+    \end{enumerate}
+
+\item For the function $J=(x_1+x_2-2)^2$, where $x_1$ and $x_2$ are a single valued variables (not vectors):
+\begin{enumerate}
+\item What are the partial gradients, $\frac{\partial J}{\partial x_1}$ and $\frac{\partial J}{\partial x_2}$?  Show work to support your answer.
+Use a the power rule and chain rule.
+$$\frac{\partial J}{\partial x_1} = 2(x_1 + x_2 - 2)\frac{\partial(x_1 + x_2 - 2)}{\partial x_1} = 2(x_1 + x_2 - 2) $$
+$$\frac{\partial J}{\partial x_2} = 2(x_1 + x_2 - 2)\frac{\partial(x_1 + x_2 - 2)}{\partial x_2} = 2(x_1 + x_2 - 2) $$
+\item Create a 3D plot of  $x_1$ vs $x_2$, vs $J$ using matplotlib.
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=.5]{images/Theory-3D-plot.png}
+\end{figure}
+
+\item Based on your plot, what are the values of $x_1$ and $x_2$ that minimize $J$?\\
+The plot appears to have a minimum when $x_1 \approx x_2$.
+Looking at the derivatives we can see that it there are infinite minima when $ x_1 + x_2 = - 2$
+\end{enumerate}
+
+\end{enumerate}
+
+\section{Closed Form Linear Regression}\label{linreg}
+\begin{enumerate}
+\item The final model in the form $y=\theta_0+\theta_1x_{:,1} + ...$\\
+$$ y = 3204.80699 + 1154.143688x_1 + -211.263046x_2 $$
+\item The root mean squared error.\\
+RMSE $ = 537.534204$
+\end{enumerate}
+
+
+\section{Locally-Weighted Linear Regression}
+\begin{enumerate}
+\item The root mean squared error.\\
+RMSE $ =  2367.61734914$ 
+\end{enumerate}
+
+\newpage
+\section{Gradient Descent}
+\begin{enumerate}
+\item Final model\\
+After 26 iterations:
+$$y = 3204.806815 + 1197.711313x_1 - 219.237996x_2$$
+\item A graph of the RMSE if the \emph{training} and \emph{testing} sets as a function of the iteration\\
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=.5]{images/Q4-RMSE-vs-Iterations.png}
+\end{figure}
+\item The final RMSE \emph{testing} error.\\
+RMSE $ = 537.534267$
+\end{enumerate}
+
+
+\end{document}
