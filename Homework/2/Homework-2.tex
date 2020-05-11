@@ -6,10 +6,14 @@
 \documentclass[12pt]{article}
 \usepackage[margin=0.7in]{geometry}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{float}
 \usepackage{comment}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{listings}
+\usepackage{tikz}
 
 \includecomment{versionB}
 %\excludecomment{versionB}
@@ -17,8 +21,6 @@
 \begin{document}
 \maketitle
 
-
-\newpage
 \section{Theory}
 \begin{enumerate}
 \item Consider the following set of training examples for an unknown target function:  $(x_1, x_2)\rightarrow y$:
@@ -41,11 +43,65 @@ Y & $x_1$ & $x_2$ & Count\\
 \end{center}
 \end{table}
 	\begin{enumerate}
-	\item What is the sample entropy, $H(Y)$ from this training data (using log base 2)?
-	\item What are the information gains for branching on variables $x_1$ and $x_2$?
-	\item Draw the deicion tree that would be learned by the ID3 algorithm without pruning from this training data?
+	\item What is the sample entropy, $H(Y)$ from this training data (using log base 2)?\\
+    $H(Y) = \sum_{i=1}^n(-P(v_i)\log_nP(v_i))$
+    We have 2 $v_i$ one for $+$ one for $-$.
+    $$H(Y) = -\frac{12}{21}\log_2(\frac{12}{21}) + -\frac{9}{21}\log_2(\frac{9}{21}) \approx .082447$$
+	\item What are the information gains for branching on variables $x_1$ and $x_2$?\\
+    $$IG(A) = H(\frac{p}{p+n},\frac{n}{p+n}) - \mathbb{E}(H(A))$$
+    $$H(Y) = \sum_{i=1}^n(-P(v_i)\log_nP(v_i))$$
+    $$\mathbb{E}(H(A)) = \sum_{i=1}^k\frac{p_i+n_i}{p+n}H(\frac{p_i}{p_i+n_i},\frac{n_i}{p_i+n_i})$$
+    Branching on $x_1$
+    $$p_T = 7 \quad n_T = 1$$
+    $$p_F = 5 \quad n_F = 8$$
+    $$\mathbb{E}(H(x_1)) = \frac{8}{21}\cdot(-\frac{7}{21}\log_2(\frac{7}{21}) + -\frac{1}{21}\log_2(\frac{1}{21})) +
+                           \frac{13}{21}\cdot(-\frac{5}{21}\log_2(\frac{5}{21}) + -\frac{8}{21}\log_2(\frac{8}{21}))
+                           \approx .91445$$
+    $$IG(x_1) = -\frac{12}{21}\log_2(\frac{12}{21}) + -\frac{9}{21}\log_2(\frac{9}{21}) - .91445 \approx .070778$$
+    Branching on $x_2$
+    $$p_T = 7 \quad n_T = 3$$
+    $$p_F = 5 \quad n_F = 6$$
+    $$\mathbb{E}(H(x_2)) = \frac{10}{21}\cdot(-\frac{7}{21}\log_2(\frac{7}{21}) + -\frac{3}{21}\log_2(\frac{3}{21})) +
+                           \frac{11}{21}\cdot(-\frac{5}{21}\log_2(\frac{5}{21}) + -\frac{6}{21}\log_2(\frac{6}{21}))
+                           \approx .971258$$
+    $$IG(x_2) = -\frac{12}{21}\log_2(\frac{12}{21}) + -\frac{9}{21}\log_2(\frac{9}{21}) - .971258 \approx .0139700$$
+    Since $IG(x_3) > IG(x_2)$ we branch on $x_2$
+	\item Draw the deicion tree that would be learned by the ID3 algorithm without pruning from this training data?\\
 	\end{enumerate}
-	
+
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}
+    \tikzstyle{level 1}=[level distance = 15mm, sibling distance=35mm]
+    \tikzstyle{level 2}=[level distance = 15mm, sibling distance=15mm]
+    \node(0)[]{$x_1$}
+        child{node(1){$x_2$}
+            child{node{$+$} edge from parent node[left]{T}}
+            child{node{$+$} edge from parent node[right]{F}}
+            edge from parent node[left]{T}
+        }
+        child{node{$x_2$}
+            child{node{$+$} edge from parent node[left]{T}}
+            child{node{$-$} edge from parent node[right]{F}}
+            edge from parent node[right]{F}
+        };
+\end{tikzpicture}
+\end{figure}
+Which can be simplified by combining the T decision on $x_1$ to always be true.
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}
+    \tikzstyle{level 1}=[level distance = 15mm, sibling distance=35mm]
+    \tikzstyle{level 2}=[level distance = 15mm, sibling distance=15mm]
+    \node(0)[]{$x_1$}
+        child{node(1){$+$} edge from parent node[left]{T}}
+        child{node{$x_2$}
+            child{node{$+$} edge from parent node[left]{T}}
+            child{node{$-$} edge from parent node[right]{F}}
+            edge from parent node[right]{F}
+        };
+\end{tikzpicture}
+\end{figure}
 \item We decided that maybe we can use the number of characters and the average word length an essay to determine if the student should get an $A$ in a class or not.  Below are five samples of this data:
 \begin{table}[h]
 \begin{center}
@@ -63,171 +119,142 @@ Y & $x_1$ & $x_2$ & Count\\
 \end{center}
 \end{table}
 	\begin{enumerate}
-	\item What are the class priors, $P(A=Yes), P(A=No)$? (2pt)
-	\item Find the parameters of the Gaussians necessary to do Gaussian Naive Bayes classification on this decision to give an A or not.  Standardize the features first over all the data together so that there is no unfair bias towards the features of different scales.
-	\item Using your response from the prior question, determine if an essay with 242 characters and an average word length of 4.56 should get an A or not.
+	\item What are the class priors, $P(A=Yes), P(A=No)$?\\
+    $$P(A=Yes) = \frac{3}{5} \qquad P(A=No) = \frac{2}{5}$$
+
+	\item Find the parameters of the Gaussians necessary to do Gaussian Naive Bayes classification on this decision to give an A or not.  Standardize the features first over all the data together so that there is no unfair bias towards the features of different scales.\\
+
+    $$\mu_{char} = 208 \quad \sigma_{char} = 145.21536$$
+    $$\mu_{len} = 4.01 \quad \sigma_{len} = 1.32348$$
+    Normalized table:
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\# of Chars & Average Word Length & Give an A\\
+\hline
+\phantom{-}0.0551 & \phantom{-}1.2618 & Yes\\
+-0.9572 & \phantom{-}0.5818 & Yes\\
+\phantom{-}0.6473 & -1.2845 & No \\
+-1.0191 & -0.6422 & Yes \\
+\phantom{-}1.2740 &  \phantom{-}0.0831 & No\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}\\
+    Give A:
+    $$\mu_{char} = -.64033 \quad \sigma_{char} = 0.60306$$
+    $$\mu_{len} = .40047 \quad \sigma_{len} = 0.96487$$
+    Don't give A:
+    $$\mu_{char} = 0.96065 \quad \sigma_{char} = 0.44314$$
+    $$\mu_{len} = -.6007 \quad \sigma_{len} = .96704$$
+
+	\item Using your response from the prior question, determine if an essay with 242 characters and an average word length of 4.56 should get an A or not.\\
+    Normalized data: chars = $0.2341$ average length = $0.41557$
+    \begin{figure}[h!]
+    $$P(A=Yes | [0.2341,0.41557]) = P(A=Yes)*P(c=0.2341|A=Yes)*P(l=0.41557|A=Yes)$$
+    $$P(A=Yes | [0.2341,0.41557]) = \frac{3}{5}\cdot\frac{1}{0.60306\sqrt{2\pi}}e^{-\frac{(0.2341 - -0.64033)^2}{2(0.60306)^2}}\cdot\frac{1}{0.96487\sqrt{2\pi}}e^{-\frac{(0.41557 - 0.40047)^2}{2(0.96487)^2}} \approx .05735$$
+    $$P(A=No | [0.2341,0.41557]) = P(A=No)*P(c=0.2341|A=No)*P(l=0.41557|A=No)$$
+    $$P(A=No | [0.2341,0.41557]) = \frac{3}{5}\cdot\frac{1}{0.44314\sqrt{2\pi}}e^{-\frac{(0.2341 - 0.96065)^2}{2(0.44314)^2}}\cdot\frac{1}{0.96704\sqrt{2\pi}}e^{-\frac{(0.41557 - -0.6007)^2}{2(0.96704)^2}} \approx .03345$$
+    \end{figure}\\
+    Since $P(A=Yes | x) > P(A=No | x)$ we assign this paper an A.
 	\end{enumerate}
 \item Consider the following questions pertaining to a k-Nearest Neighbors algorithm:
 	\begin{enumerate}
-	\item How could you use a \emph{validation set} to determine the user-defined parameter $k$?
+	\item How could you use a \emph{validation set} to determine the user-defined parameter $k$?//
+    Using the validation set try different values of k and plot the recall vs precision and choose the k with the largest area under the curve.
 	\end{enumerate}
 \end{enumerate}
 
 
 \newpage
 \section{Logistic Regression}\label{naive}
-Let's train and test a \emph{Logistic Regression Classifier} to classify flowers from the Iris Dataset.\\
-
-\noindent
-First download import the data from sklearn.datasets.  As mentioned in the Datasets area,  The data set consists of 50 samples from each of three species of Iris (Iris setosa, Iris virginica and Iris versicolor). Four features were measured from each sample: the length and the width of the sepals and petals, in centimeters.  We will map this into a binary classification problem between Iris setosa versus Iris virgincia and versicolor.  We will use just the first 2 features, width and length of the sepals.  
-
-For this part, we will be practicing gradient descent with logistic regression.
-
-Use the following code to load the data, and binarize the target values.
-
-\begin{lstlisting}
-iris = skdata.load_iris()
-X = iris.data[:, :2]
-y = (iris.target != 0) * 1
-\end{lstlisting}
-
-\noindent
-\paragraph{Write a script that:}
-\begin{enumerate}
-  \item Reads in the data with the script above.
-  \item Standardizes the data using the mean and standard deviation
-\item Initialize the parameters of $\theta$ using random values in the range [-1, 1]
-\item Do \textbf{batch} gradient descent
-\item Terminate when absolute value change in the loss on the data is less than $2^{-23}$, or after $10,000$ iterations have passed (whichever occurs first).
-\item Use a learning rate $\eta=0.01$.
-  \item While the termination criteria (mentioned above in the implementation details) hasn't been met
-  \begin{enumerate}
-  	\item Compute the loss of the data using the logistic regression cost
-  	\item Update each parameter using \emph{batch} gradient descent
-  \end{enumerate}
-\end{enumerate}
-
-Plot the data and the decision boundary using matplotlib.  Verify your solution with the LogisticRegression sklearn method.
-
-\begin{lstlisting}
-from sklearn.linear_model import LogisticRegression
-lgr = LogisticRegression(penalty='none',solver='lbfgs',max_iter=10000)
-lgr.fit(X,y)
-\end{lstlisting}
-
 In your writeup, present the thetas from gradient descent that minimize the loss function as well as plots of your method versus the built in LogisticRegression method.
+
+My computed thetas:
+\begin{tabular}{|l|l|}
+\hline
+Variable   & Value  \\
+\hline
+$\theta_0$ & 2.1681 \\
+$\theta_1$ & 3.8023 \\
+$\theta_2$ &-2.5665 \\
+\hline
+\end{tabular}
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=1\linewidth]{images/Q2-threshold.png}
+    \caption{Graph showing the boundary and likelyhood\\ of my logistic regression}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=1\linewidth]{images/Q2-cost-vs-iterations.png}
+    \caption{Graph showing the loss as a function\\ of the iterations}
+\end{subfigure}
+\end{figure}
+
+Built in thetas:
+\begin{tabular}{|l|l|}
+\hline
+Variable   & Value  \\
+\hline
+$\theta_0$ &  49.26318 \\
+$\theta_1$ &  69.73723 \\
+$\theta_2$ & -30.90205 \\
+\hline
+\end{tabular}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=.5]{images/Q2-built-in-threshold.png}
+    \caption{Graph showing the boundary and likelyhood of the sklearn's logistic regression}
+\end{figure}
+If we look at these two lines in slope intercept form we get:
+$$ \text{Mine:} y = \frac{3.8023}{2.5665} + \frac{2.1681}{2.5665} \implies y = 1.4815x + 0.8448$$
+$$ \text{Sklearn:} y = \frac{69.73723}{30.90205} + \frac{49.26318}{30.90205} \implies y = 2.2567x + 1.5942$$
+
+We can see that it is close but not quite there.
+I looked through sklearn's implementation and it seems to be applying some extra terms to the gradient having to do with the L1 distances.
+If I increase the max iterations I see improvements getting my linear equation to $ y = 1.7646x + 1.0606$
+Which correctly splits the data but seems uncertain near the boundary.
 
 \newpage
 \section{Logistic Regression Spam Classification}
-Let's train and test a \emph{Logistic Regression Classifier} to classifiy Spam or Not from the Spambase Dataset.\\
-
-\noindent
-First download the dataset \emph{spambase.data} from Blackboard.  As mentioned in the Datasets area, this dataset contains 4601 rows of data, each with 57 continuous valued features followed by a binary class label (0=not-spam, 1=spam).  There is no header information in this file and the data is comma separated.  \\
-
-\noindent
-\paragraph{Write a script that:}
+Using a decision threshold of $.5$
 \begin{enumerate}
-  \item Reads in the data.
-  \item Randomizes the data.
-  \item Selects the first 2/3 (round up) of the data for training and the remaining for testing (you may use  \textbf{sklearn train\_test\_split} for this part)
-  \item Standardizes the data (except for the last column of course) using the training data
-  \item Initialize the parameters of $\theta$ using random values in the range [-1, 1]
-\item Do \textbf{batch} gradient descent
-\item Terminate when absolute value change in the loss on the data is less than $2^{-23}$, or after $1,500$ iterations have passed (whichever occurs first, this will likely be a slow process).
-\item Use a learning rate $\eta=0.01$.
-  \item Classify each testing sample using the model and choosing the class label based on which class probability is higher.
-  \item Computes the following statistics using the testing data results:
-    \begin{enumerate}
-        \item Precision
-        \item Recall
-        \item F-measure
-        \item Accuracy
-    \end{enumerate}
+    \item Precision: $0.617925$
+    \item Recall:    $1.0$
+    \item F-measure: $0.768484$
+    \item Accuracy:  $0.682975$
 \end{enumerate}
+But this threshold seems to not be ideal as the precison vs recall graph shows.
+\begin{figure}[h]
+\centering
+\includegraphics[scale =.5]{images/Q3-precision-vs-recall.png}
+\end{figure}
 
-
-\paragraph{Implementation Details}
+A better threshold would be $.9$ which gives:
 \begin{enumerate}
-\item Seed the random number generate with zero prior to randomizing the data
-\item There are a lot of $\theta$s and this will likely be a slow process
-\end{enumerate}
-
-\paragraph{In your report you will need:}
-\begin{enumerate}
-\item The statistics requested for your Logistic classifier run.
+    \item Precision: $0.784566$
+    \item Recall:    $0.931298$
+    \item F-measure: $0.851658$
+    \item Accuracy:  $0.833660$
 \end{enumerate}
 
 \newpage
 
 
 \section{Naive Bayes Classifier}\label{naive}
-Let's train and test a \emph{Naive Bayes Classifier} to classifiy Spam or Not from the Spambase Dataset.\\
-
-\noindent
-First download the dataset \emph{spambase.data} from Blackboard.  As mentioned in the Datasets area, this dataset contains 4601 rows of data, each with 57 continuous valued features followed by a binary class label (0=not-spam, 1=spam).  There is no header information in this file and the data is comma separated.  As always, your code should work on any dataset that lacks header information and has several comma-separated continuous-valued features followed by a class id $\in {0,1}$.\\
-
-\noindent
-\paragraph{Write a script that:}
 \begin{enumerate}
-  \item Reads in the data.
-  \item Randomizes the data.
-  \item Selects the first 2/3 (round up) of the data for training and the remaining for testing
-  \item Standardizes the data (except for the last column of course) using the training data
-  \item Divides the training data into two groups: Spam samples, Non-Spam samples.
-  \item Creates Normal models for each feature for each class.
-  \item Classify each testing sample using these models and choosing the class label based on which class probability is higher.
-  \item Computes the following statistics using the testing data results:
-    \begin{enumerate}
-        \item Precision
-        \item Recall
-        \item F-measure
-        \item Accuracy
-    \end{enumerate}
+    \item Precision: $0.67612$
+    \item Recall:    $0.97201$
+    \item F-measure: $0.79749$
+    \item Accuracy:  $0.74690$
 \end{enumerate}
 
 
-\paragraph{Implementation Details}
-\begin{enumerate}
-\item Seed the random number generate with zero prior to randomizing the data
-\item You may want to consider using the log-exponent trick to avoid underflow issues.  Here's a link about it:  https://stats.stackexchange.com/questions/105602/example-of-how-the-log-sum-exp-trick-works-in-naive-bayes
-\item If you decide to work in log space, realize that python interprets $0log0$ as inf.  You should identify this situation and either add an EPS (very small positive number) or consider it to be a value of zero.
-\end{enumerate}
-
-\paragraph{In your report you will need:}
-\begin{enumerate}
-\item The statistics requested for your Naive Bayes classifier run.
-\end{enumerate}
-
-\newpage
-\section*{Submission}
-For your submission, upload to Blackboard a single zip file containing:
-
-\begin{enumerate}
-\item PDF Writeup
-\item Python notebook Code
-\end{enumerate}
-
-
-\noindent
-The PDF document should contain the following:
-
-\begin{enumerate}
-\item Part 1:
-	\begin{enumerate}
-	\item Answers to Theory Questions
-	\end{enumerate}
-\item Part 2:
-	\begin{enumerate}
-	\item Requested Logistic Regression thetas and plots
-	\end{enumerate}
-\item Part 3:
-	\begin{enumerate}
-	\item Requested Classification Statistics
-	\end{enumerate}
-\item Part 4:
-	\begin{enumerate}
-	\item Requested Classification Statistics
-	\end{enumerate}
-\end{enumerate}
 \end{document}
 
