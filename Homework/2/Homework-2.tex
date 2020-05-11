@@ -161,7 +161,7 @@ Which can be simplified by combining the T decision on $x_1$ to always be true.
 	\end{enumerate}
 \item Consider the following questions pertaining to a k-Nearest Neighbors algorithm:
 	\begin{enumerate}
-	\item How could you use a \emph{validation set} to determine the user-defined parameter $k$?//
+	\item How could you use a \emph{validation set} to determine the user-defined parameter $k$?\\
     Using the validation set try different values of k and plot the recall vs precision and choose the k with the largest area under the curve.
 	\end{enumerate}
 \end{enumerate}
@@ -214,7 +214,7 @@ $\theta_2$ & -30.90205 \\
 \end{figure}
 If we look at these two lines in slope intercept form we get:
 $$ \text{Mine:} y = \frac{3.8023}{2.5665} + \frac{2.1681}{2.5665} \implies y = 1.4815x + 0.8448$$
-$$ \text{Sklearn:} y = \frac{69.73723}{30.90205} + \frac{49.26318}{30.90205} \implies y = 2.2567x + 1.5942$$
+$$ \text{Sklearn:} y = \frac{69.73723}{30.90205} + \frac{49.26318}{30.90205} \implies y = 2.2397x + 1.5919$$
 
 We can see that it is close but not quite there.
 I looked through sklearn's implementation and it seems to be applying some extra terms to the gradient having to do with the L1 distances.
@@ -225,10 +225,10 @@ Which correctly splits the data but seems uncertain near the boundary.
 \section{Logistic Regression Spam Classification}
 Using a decision threshold of $.5$
 \begin{enumerate}
-    \item Precision: $0.617925$
-    \item Recall:    $1.0$
-    \item F-measure: $0.768484$
-    \item Accuracy:  $0.682975$
+    \item Precision: $0.900693$
+    \item Recall:    $0.992366$
+    \item F-measure: $0.944310$
+    \item Accuracy:  $0.939948$
 \end{enumerate}
 But this threshold seems to not be ideal as the precison vs recall graph shows.
 \begin{figure}[h]
@@ -236,12 +236,12 @@ But this threshold seems to not be ideal as the precison vs recall graph shows.
 \includegraphics[scale =.5]{images/Q3-precision-vs-recall.png}
 \end{figure}
 
-A better threshold would be $.9$ which gives:
+A better threshold would be $.6$ which gives:
 \begin{enumerate}
-    \item Precision: $0.784566$
-    \item Recall:    $0.931298$
-    \item F-measure: $0.851658$
-    \item Accuracy:  $0.833660$
+    \item Precision: $0.913043$
+    \item Recall:    $0.988550$
+    \item F-measure: $0.949297$
+    \item Accuracy:  $0.945822$
 \end{enumerate}
 
 \newpage
@@ -249,10 +249,10 @@ A better threshold would be $.9$ which gives:
 
 \section{Naive Bayes Classifier}\label{naive}
 \begin{enumerate}
-    \item Precision: $0.67612$
-    \item Recall:    $0.97201$
-    \item F-measure: $0.79749$
-    \item Accuracy:  $0.74690$
+    \item Precision: $1.00000$
+    \item Recall:    $0.95547$
+    \item F-measure: $0.97723$
+    \item Accuracy:  $0.97715$
 \end{enumerate}
 
 
