@@ -1,0 +1,227 @@
+\title{CS 383 - Machine Learning}
+\author{
+        Assignment 3 - Dimensionality Reduction\\
+}
+\date{}
+\documentclass[12pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{comment}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+\maketitle
+
+
+\section{Theory Questions}
+\begin{enumerate}
+
+\item Consider the following data:\\
+\begin{center}
+$
+ \begin{bmatrix}
+    -2 & 1\\
+    -5 & -4\\
+    -3 & 1\\
+    0 & 3\\
+    -8 & 11\\
+    -2 & 5\\
+    1 & 0\\
+    5 & -1\\
+    -1 & -3\\
+    6 & 1\\
+\end{bmatrix}
+$
+\end{center}
+    \begin{enumerate}
+    \item Find the principle components of the data (you must show the math, including how you compute the eigenvectors and eigenvalues).
+    Make sure you standardize the data first and that your principle components are normalized to be unit length.
+    As for the amount of detail needed in your work imagine that you were working on paper with a basic calculator.
+    Show me whatever you would be writing on that paper.
+    $$ mean_0 = \frac{-2 -5 -3 0 -8 -2 1 5 -1 6}{10} = -.9 \quad mean_1 = \frac{1 -4 1 3 11 5 0 -1 -3 1}{10} = 1.4 $$
+    $$ stdev_0 = \sqrt{\frac{\sum(x_{0i} - mean_0)}{10}} = 4.011  \quad stdev_1 = 4.055 $$
+\begin{center}
+$
+A = \begin{bmatrix}
+-0.27422981 & -0.09865272 \\
+-1.02212929 & -1.33181178 \\
+-0.52352964 & -0.09865272 \\
+ 0.22436984 &  0.3946109  \\
+-1.77002878 &  2.36766539 \\
+-0.27422981 &  0.88787452 \\
+ 0.47366967 &-0.34528454  \\
+ 1.47086898 & -0.59191635 \\
+-0.02492998 & -1.08517997 \\
+ 1.72016881 & -0.09865272
+\end{bmatrix}
+$
+\end{center}
+$$\text{Covariance:} C = \frac{1}{N-1}A^TA =
+\begin{bmatrix}
+     1.111 & -0.454 \\
+    -0.454 &  1.111
+\end{bmatrix}$$
+$$\text{Eigenvalues:} |C - \lambda I| = 0 \implies (1.111 - \lambda)(1.111 - \lambda) - (-0.454)(-0.454)$$
+$$ \implies \lambda^2 - 2.222\lambda + 1.111^2 - 0.454^2 = \lambda^2 - 2.222\lambda + 1.028205$$
+$$ \lambda_{1,2} = \frac{- (-2.222) \pm \sqrt{(-2.222)^2 - 4(1)(1.028205)}}{2(1)} = 1.111 \pm \sqrt{1.111^2 -1.028205}$$
+$$ \lambda_1 = 1.5615 \quad \lambda_2 = 0.6585 $$
+$$ \text{vec}_1 =
+\begin{bmatrix}
+     1.111 & -0.454 \\
+    -0.454 &  1.111
+\end{bmatrix}
+x = 1.5615 x
+\implies
+\begin{array}{c}
+1.111x_0 - 0.454x_1 = 1.5615x_0 \\
+-0.454x_0 + 1.111x_1 = 1.5615x_1
+\end{array}
+$$
+
+$$
+\implies
+\begin{array}{c}
+-0.454x_0 -0.454x_1 = 0 \\
+-0.454x_0 + -0.454x_1 = 0
+\end{array}
+\implies x_0 = x_1 \implies v_1 =
+\begin{bmatrix}
+-1 \\
+1
+\end{bmatrix}
+$$
+$$
+\frac{v_1}{|v_1|} = \frac{1}{\sqrt{1^2+1^2}} \begin{bmatrix} -1 \\ 1 \end{bmatrix}
+= \begin{bmatrix} -\frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} \end{bmatrix}
+\approx \begin{bmatrix} -0.7071 \\ 0.7071 \end{bmatrix}
+$$
+
+$$ \text{vec}_2 =
+\begin{bmatrix}
+     1.111 & -0.454 \\
+    -0.454 &  1.111
+\end{bmatrix}
+x = 0.6585 x
+\implies
+\begin{array}{c}
+1.111x_0 - 0.454x_1 = 0.6585x_0\\
+-0.454x_0 + 1.111x_1 = 0.6585x_1
+\end{array}
+$$
+
+$$
+\implies
+\begin{array}{c}
+0.454x_0 -0.454x_1 = 0 \\
+-0.454x_0 + 0.454x_1 = 0
+\end{array}
+\implies -x_0 = x_1 \implies v_1 =
+\begin{bmatrix}
+1 \\
+1
+\end{bmatrix}
+$$
+$$
+\frac{v_2}{|v_2|} = \frac{1}{\sqrt{1^2+1^2}} \begin{bmatrix} 1 \\ 1 \end{bmatrix}
+= \begin{bmatrix} \frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} \end{bmatrix}
+\approx \begin{bmatrix} 0.7071 \\ 0.7071 \end{bmatrix}
+$$
+$$ \lambda_1 = 1.5615 \quad v_{\lambda_1} = \begin{bmatrix} -0.7071 \\ 0.7071 \end{bmatrix} $$
+$$ \lambda_2 = 0.6585 \quad v_{\lambda_2} = \begin{bmatrix}  0.7071 \\ 0.7071 \end{bmatrix} $$
+    \item Project the data onto the principle component corresponding to the largest eigenvalue found in the previous part (3pts).
+        \newline
+        Largest eigenvalue = $\lambda_1 = 1.5615$ with the corresponding vector $v_{\lambda_1}\begin{bmatrix} -0.7071 \\ 0.7071 \end{bmatrix}$.
+        To project we just need to do one matrix multiplication
+\begin{center}
+$$
+ \begin{bmatrix}
+-0.27422981 & -0.09865272 \\
+-1.02212929 & -1.33181178 \\
+-0.52352964 & -0.09865272 \\
+ 0.22436984 &  0.3946109  \\
+-1.77002878 &  2.36766539 \\
+-0.27422981 &  0.88787452 \\
+ 0.47366967 &-0.34528454  \\
+ 1.47086898 & -0.59191635 \\
+-0.02492998 & -1.08517997 \\
+ 1.72016881 & -0.09865272
+\end{bmatrix}
+\begin{bmatrix}
+-0.7071 \\
+0.7071
+\end{bmatrix}
+=
+\begin{bmatrix}
+ 0.12415175 \\
+-0.21897859 \\
+ 0.30043335 \\
+ 0.12037861 \\
+ 2.92579161 \\
+ 0.82173185 \\
+-0.57908808 \\
+-1.45860949 \\
+-0.74970996 \\
+-1.28610104
+\end{bmatrix}
+$$
+\end{center}
+    \end{enumerate}
+\end{enumerate}
+
+
+\newpage
+\section{Dimensionality Reduction via PCA}
+\begin{itemize}
+    \item Built in, sklearn knn where k=1, Score: $0.23$
+    \item My knn where k=1, Score: $0.23$
+    \item My knn where k=1 with 100 principle components, Score: $0.25$
+    \item My knn where k=1 with 100 principle components and whitened, Score: $0.30$
+\end{itemize}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.4]{images/Q2-PC1-vs-PC2.png}
+\caption{Visualization of reduction to 2D using PCA.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.4]{images/Q2-PC1-vs-PC2-Whitened.png}
+\caption{Visualization of reduction to 2D using PCA and whitened.}
+\end{figure}
+
+\newpage
+\section{Eigenfaces}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=.7]{images/Q3-PC1.png}
+    \caption{The first Principle component}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=.7]{images/Q3-PC1-PC2-min-max.png}
+    \caption{The max and min photos for Principle components 1 and 2}
+\end{figure}
+We can see from the previous image PC1 appears to focus on the face contrasting to the background as well as basic eye nose and mouth placement.
+The min for PC1 has a bright face with a darker background behind him while the max for PC1 has the opposite, a dark center with a brighter background.
+\newline
+Meanwhile it appears the PC2 deals with the left and right side of a face being lit in comparison to the other side.
+The min for PC2 has a bright left side and a dark right side while the max for PC2 again has the opposite, a dark left side and a bright right side.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=.7]{images/Q3-PC1-reconstruction.png}
+    \caption{Reconstruction of the first image in the test data using just the first principal component.}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=.7]{images/Q3-image-95-reconstruction.png}
+    \caption{Reconstruction of the first image in the test data keeping 95\% of the variance. \newline
+             This image used 188 principal components to capture 95\% of the variance in the image.}
+\end{figure}
+
+\end{document}
+
